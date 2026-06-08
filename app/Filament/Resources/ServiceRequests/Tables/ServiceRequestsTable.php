@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ServiceRequests\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -9,6 +10,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceRequestsTable
 {
@@ -23,11 +25,17 @@ class ServiceRequestsTable
 
                 TextColumn::make('company_name')
                     ->label('Entreprise')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
 
                 TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
+
+                TextColumn::make('phone')
+                    ->label('Téléphone')
+                    ->searchable()
+                    ->toggleable(),
 
                 TextColumn::make('service.title')
                     ->label('Service')
@@ -36,16 +44,33 @@ class ServiceRequestsTable
                 TextColumn::make('priority')
                     ->label('Priorité')
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Faible' => 'gray',
+                        'Normale' => 'info',
+                        'Urgente' => 'danger',
+                        default => 'gray',
+                    })
                     ->sortable(),
 
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Nouvelle' => 'warning',
+                        'En cours' => 'info',
+                        'Contacté' => 'primary',
+                        'Acceptée' => 'success',
+                        'Refusée' => 'danger',
+                        'Terminée' => 'gray',
+                        default => 'gray',
+                    })
                     ->sortable(),
 
                 TextColumn::make('attachment')
-                    ->label('Fichier')
-                    ->limit(30),
+                    ->label('Fichier joint')
+                    ->formatStateUsing(fn ($state) => $state ? 'Disponible' : 'Aucun fichier')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'gray'),
 
                 TextColumn::make('created_at')
                     ->label('Date')
@@ -73,6 +98,19 @@ class ServiceRequestsTable
                     ]),
             ])
             ->recordActions([
+                Action::make('open_attachment')
+                    ->label('Voir le fichier')
+                    ->icon('heroicon-o-paper-clip')
+                    ->url(function ($record) {
+                        if (!$record->attachment) {
+                            return null;
+                        }
+
+                        return asset('storage/' . $record->attachment);
+                    })
+                    ->openUrlInNewTab()
+                    ->visible(fn ($record) => !empty($record->attachment)),
+
                 ViewAction::make(),
                 EditAction::make(),
             ])

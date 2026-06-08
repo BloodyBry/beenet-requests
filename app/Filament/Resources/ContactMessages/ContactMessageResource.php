@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ContactMessages;
 
-use App\Filament\Resources\ContactMessages\Pages\CreateContactMessage;
 use App\Filament\Resources\ContactMessages\Pages\EditContactMessage;
 use App\Filament\Resources\ContactMessages\Pages\ListContactMessages;
 use App\Filament\Resources\ContactMessages\Pages\ViewContactMessage;
@@ -15,14 +14,38 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ContactMessageResource extends Resource
 {
     protected static ?string $model = ContactMessage::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
-    protected static ?string $recordTitleAttribute = 'subject';
+    protected static string|UnitEnum|null $navigationGroup = 'Demandes clients';
+
+    protected static ?string $navigationLabel = 'Messages de contact';
+
+    protected static ?string $modelLabel = 'Message de contact';
+
+    protected static ?string $pluralModelLabel = 'Messages de contact';
+
+    protected static ?int $navigationSort = 4;
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -39,18 +62,10 @@ class ContactMessageResource extends Resource
         return ContactMessagesTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => ListContactMessages::route('/'),
-            'create' => CreateContactMessage::route('/create'),
             'view' => ViewContactMessage::route('/{record}'),
             'edit' => EditContactMessage::route('/{record}/edit'),
         ];

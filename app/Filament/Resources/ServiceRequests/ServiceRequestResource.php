@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ServiceRequests;
 
-use App\Filament\Resources\ServiceRequests\Pages\CreateServiceRequest;
 use App\Filament\Resources\ServiceRequests\Pages\EditServiceRequest;
 use App\Filament\Resources\ServiceRequests\Pages\ListServiceRequests;
 use App\Filament\Resources\ServiceRequests\Pages\ViewServiceRequest;
@@ -15,14 +14,38 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ServiceRequestResource extends Resource
 {
     protected static ?string $model = ServiceRequest::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
 
-    protected static ?string $recordTitleAttribute = 'full_name';
+    protected static string|UnitEnum|null $navigationGroup = 'Demandes clients';
+
+    protected static ?string $navigationLabel = 'Demandes de service';
+
+    protected static ?string $modelLabel = 'Demande de service';
+
+    protected static ?string $pluralModelLabel = 'Demandes de service';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('status', 'Nouvelle')->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'info';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -39,18 +62,10 @@ class ServiceRequestResource extends Resource
         return ServiceRequestsTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => ListServiceRequests::route('/'),
-            'create' => CreateServiceRequest::route('/create'),
             'view' => ViewServiceRequest::route('/{record}'),
             'edit' => EditServiceRequest::route('/{record}/edit'),
         ];

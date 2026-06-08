@@ -63,6 +63,7 @@ class ServiceRequestForm
                 TextInput::make('attachment')
                     ->label('Fichier joint')
                     ->disabled()
+                    ->dehydrated(false)
                     ->helperText('Le fichier est envoyé depuis le formulaire public.'),
 
                 Textarea::make('description')

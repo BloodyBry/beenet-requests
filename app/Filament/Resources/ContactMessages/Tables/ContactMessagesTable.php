@@ -25,7 +25,8 @@ class ContactMessagesTable
                     ->searchable(),
 
                 TextColumn::make('phone')
-                    ->label('Téléphone'),
+                    ->label('Téléphone')
+                    ->toggleable(),
 
                 TextColumn::make('subject')
                     ->label('Sujet')

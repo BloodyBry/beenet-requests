@@ -23,19 +23,44 @@ class QuoteRequestsTable
 
                 TextColumn::make('company_name')
                     ->label('Entreprise')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
 
                 TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
 
+                TextColumn::make('phone')
+                    ->label('Téléphone')
+                    ->searchable()
+                    ->toggleable(),
+
                 TextColumn::make('service.title')
                     ->label('Service')
                     ->sortable(),
 
+                TextColumn::make('budget')
+                    ->label('Budget')
+                    ->toggleable(),
+
+                TextColumn::make('deadline')
+                    ->label('Délai')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Nouvelle' => 'warning',
+                        'En cours' => 'info',
+                        'Contacté' => 'primary',
+                        'Acceptée' => 'success',
+                        'Refusée' => 'danger',
+                        'Terminée' => 'gray',
+                        default => 'gray',
+                    })
                     ->sortable(),
 
                 TextColumn::make('created_at')
